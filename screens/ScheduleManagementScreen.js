@@ -1,9 +1,10 @@
-// screens/ScheduleManagementScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
 import ScheduleService from '../services/ScheduleService';
+import Header from '../components/Header';
+import Section from '../components/Section';
+import { ScreenStyles } from '../styles/ScreenStyles';
 
 const ScheduleManagementScreen = ({ navigation }) => {
   const [subjects, setSubjects] = useState([]);
@@ -61,19 +62,16 @@ const ScheduleManagementScreen = ({ navigation }) => {
         const file = result.assets[0];
         console.log('File selected:', file.name);
         
-        // Проверяем размер файла (максимум 10MB)
         if (file.size > 10 * 1024 * 1024) {
           Alert.alert('Ошибка', 'Файл слишком большой. Максимальный размер: 10MB');
           return;
         }
 
-        // Проверяем расширение файла
         if (!file.name.toLowerCase().endsWith('.pdf')) {
           Alert.alert('Ошибка', 'Выберите файл в формате PDF');
           return;
         }
 
-        // Показываем подтверждение загрузки
         Alert.alert(
           'Подтверждение загрузки',
           `PDF файл: ${file.name}\nРазмер: ${(file.size / 1024).toFixed(2)} KB\n\nПродолжить загрузку?`,
@@ -118,15 +116,12 @@ const ScheduleManagementScreen = ({ navigation }) => {
         name: file.name,
       });
 
-      console.log('FormData created, sending request...');
-
       const API_URL = 'http://194.87.232.200/file/upload-schedule';
       console.log('Sending to:', API_URL);
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 300000); 
+      const timeoutId = setTimeout(() => controller.abort(), 300000);
 
-      // Отправляем файл на сервер
       const response = await fetch(API_URL, {
         method: 'POST',
         body: formData,
@@ -169,7 +164,6 @@ const ScheduleManagementScreen = ({ navigation }) => {
       );
     }
     
-    // Обновляем список предметов
     loadSubjects();
 
     } catch (error) {
@@ -183,7 +177,6 @@ const ScheduleManagementScreen = ({ navigation }) => {
     }
   };
 
-  // Упрощенная версия для тестирования
   const debugHandleLoadSchedule = async () => {
     if (isPicking) {
       console.log('Document picker is already in progress');
@@ -206,19 +199,16 @@ const ScheduleManagementScreen = ({ navigation }) => {
         const file = result.assets[0];
         console.log('Debug file selected:', file.name);
         
-        // Проверяем размер файла
         if (file.size > 10 * 1024 * 1024) {
           Alert.alert('Ошибка', 'Файл слишком большой. Максимальный размер: 10MB');
           return;
         }
 
-        // Проверяем расширение файла
         if (!file.name.toLowerCase().endsWith('.pdf')) {
           Alert.alert('Ошибка', 'Выберите файл в формате PDF');
           return;
         }
 
-        // Имитируем успешную загрузку для тестирования
         Alert.alert(
           'Тестовая загрузка',
           `PDF файл: ${file.name}\nРазмер: ${(file.size / 1024).toFixed(2)} KB\n\nФайл успешно выбран! Для реальной загрузки нажмите "Загрузить PDF расписание".`,
@@ -259,274 +249,108 @@ const ScheduleManagementScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={handleBack}
-          >
-            <Text style={styles.backButtonText}>‹</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Управление занятиями</Text>
-        </View>
-        <TouchableOpacity 
-          style={styles.logoutButton}
-          onPress={handleLogout}
-        >
-          <Text style={styles.logoutButtonText}>Выйти</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.menu}>
+    <View style={ScreenStyles.scheduleManagementScreenContainer}>
+      <Header
+        title="Управление занятиями"
+        onBack={handleBack}
+        onLogout={handleLogout}
+        headerStyle={ScreenStyles.scheduleManagementScreenHeader}
+      />
+      <ScrollView style={ScreenStyles.commonScrollView} showsVerticalScrollIndicator={false}>
+      <Section style={ScreenStyles.scheduleManagementScreenMenu}>
         {/* Основная кнопка загрузки */}
         <TouchableOpacity 
-          style={[styles.menuItem, (uploading || isPicking) && styles.menuItemDisabled]}
+          style={[ScreenStyles.scheduleManagementScreenMenuItem, (uploading || isPicking) && ScreenStyles.scheduleManagementScreenMenuItemDisabled]}
           onPress={handleLoadSchedule}
           disabled={uploading || isPicking}
         >
-          <View style={styles.menuItemContent}>
-            <Text style={styles.menuItemTitle}>
+          <View style={ScreenStyles.scheduleManagementScreenMenuItemContent}>
+            <Text style={ScreenStyles.scheduleManagementScreenMenuItemTitle}>
               {uploading ? 'Загрузка PDF...' : 
                isPicking ? 'Выбор файла...' : 
                'Загрузить PDF расписание'}
             </Text>
-            <Text style={styles.menuItemDescription}>
+            <Text style={ScreenStyles.scheduleManagementScreenMenuItemDescription}>
               Импорт расписания из PDF файла
             </Text>
           </View>
           {(uploading || isPicking) ? (
             <ActivityIndicator size="small" color="#4A306D" />
           ) : (
-            <Text style={styles.menuArrow}>›</Text>
+            <Text style={ScreenStyles.scheduleManagementScreenMenuArrow}>›</Text>
           )}
         </TouchableOpacity>
 
-        {/* ДЕБАГ КНОПКА - для тестирования */}
+        {/* ДЕБАГ КНОПКА */}
         <TouchableOpacity 
-          style={[styles.menuItem, {backgroundColor: '#FFF3CD'}, isPicking && styles.menuItemDisabled]}
+          style={[ScreenStyles.scheduleManagementScreenMenuItem, {backgroundColor: '#FFF3CD'}, isPicking && ScreenStyles.scheduleManagementScreenMenuItemDisabled]}
           onPress={debugHandleLoadSchedule}
           disabled={isPicking}
         >
-          <View style={styles.menuItemContent}>
-            <Text style={[styles.menuItemTitle, {color: '#856404'}]}>
+          <View style={ScreenStyles.scheduleManagementScreenMenuItemContent}>
+            <Text style={[ScreenStyles.scheduleManagementScreenMenuItemTitle, {color: '#856404'}]}>
               {isPicking ? 'Выбор файла...' : 'Тест выбора файла'}
             </Text>
-            <Text style={[styles.menuItemDescription, {color: '#856404'}]}>
+            <Text style={[ScreenStyles.scheduleManagementScreenMenuItemDescription, {color: '#856404'}]}>
               Проверка работы выбора файла (без отправки)
             </Text>
           </View>
           {isPicking ? (
             <ActivityIndicator size="small" color="#856404" />
           ) : (
-            <Text style={[styles.menuArrow, {color: '#856404'}]}>›</Text>
+            <Text style={[ScreenStyles.scheduleManagementScreenMenuArrow, {color: '#856404'}]}>›</Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.menuItem}
+          style={ScreenStyles.scheduleManagementScreenMenuItem}
           onPress={handleAddSchedule}
         >
-          <View style={styles.menuItemContent}>
-            <Text style={styles.menuItemTitle}>Добавить занятие</Text>
-            <Text style={styles.menuItemDescription}>
+          <View style={ScreenStyles.scheduleManagementScreenMenuItemContent}>
+            <Text style={ScreenStyles.scheduleManagementScreenMenuItemTitle}>Добавить занятие</Text>
+            <Text style={ScreenStyles.scheduleManagementScreenMenuItemDescription}>
               Создание нового занятия в расписании
             </Text>
           </View>
-          <Text style={styles.menuArrow}>›</Text>
+          <Text style={ScreenStyles.scheduleManagementScreenMenuArrow}>›</Text>
         </TouchableOpacity>
-      </View>
+      </Section>
 
-      <View style={styles.subjectsSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Предметы</Text>
+      <Section>
+        <View style={ScreenStyles.scheduleManagementScreenSectionHeader}>
+          <Text style={ScreenStyles.scheduleManagementScreenSectionTitle}>Предметы</Text>
           <TouchableOpacity 
-            style={styles.refreshButton}
+            style={ScreenStyles.scheduleManagementScreenRefreshButton}
             onPress={loadSubjects}
           >
-            <Text style={styles.refreshButtonText}>⟳</Text>
+            <Text style={ScreenStyles.scheduleManagementScreenRefreshButtonText}>⟳</Text>
           </TouchableOpacity>
         </View>
         
         {isLoading ? (
-          <Text style={styles.loadingText}>Загрузка предметов...</Text>
+          <Text style={ScreenStyles.scheduleManagementScreenLoadingText}>Загрузка предметов...</Text>
         ) : (
           subjects.map(subject => (
             <TouchableOpacity
               key={subject.id}
-              style={styles.subjectCard}
+              style={ScreenStyles.scheduleManagementScreenSubjectCard}
               onPress={() => handleSubjectPress(subject)}
             >
-              <View style={styles.subjectInfo}>
-                <Text style={styles.subjectName}>{subject.name}</Text>
-                <Text style={styles.subjectGroups}>{getGroupsText(subject)}</Text>
-                <Text style={styles.lessonCount}>
+              <View style={ScreenStyles.scheduleManagementScreenSubjectInfo}>
+                <Text style={ScreenStyles.scheduleManagementScreenSubjectName}>{subject.name}</Text>
+                <Text style={ScreenStyles.scheduleManagementScreenSubjectGroups}>{getGroupsText(subject)}</Text>
+                <Text style={ScreenStyles.scheduleManagementScreenLessonCount}>
                   Занятий: {subject.lessonCount || 0}
                 </Text>
               </View>
-              <Text style={styles.menuArrow}>›</Text>
+              <Text style={ScreenStyles.scheduleManagementScreenMenuArrow}>›</Text>
             </TouchableOpacity>
           ))
         )}
-      </View>
+      </Section>
+      </ScrollView>
     </View>
   );
 };
-
-// Стили остаются без изменений
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F7FF',
-    padding: 20,
-    paddingTop: 60,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  backButton: {
-    marginRight: 15,
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: '#4A306D',
-    fontWeight: 'bold',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#4A306D',
-    flex: 1,
-  },
-  logoutButton: {
-    backgroundColor: 'rgba(139, 58, 98, 0.1)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#8B3A62',
-  },
-  logoutButtonText: {
-    color: '#8B3A62',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  menu: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    marginBottom: 20,
-    shadowColor: '#4A306D',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  menuItemContent: {
-    flex: 1,
-  },
-  menuItemTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4A306D',
-    marginBottom: 4,
-  },
-  menuItemDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  menuArrow: {
-    fontSize: 24,
-    color: '#4A306D',
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
-  subjectsSection: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#4A306D',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4A306D',
-    marginBottom: 15,
-  },
-  subjectCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#F8F7FF',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  subjectInfo: {
-    flex: 1,
-  },
-  subjectName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4A306D',
-    marginBottom: 4,
-  },
-  subjectGroups: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  refreshButton: {
-    backgroundColor: 'rgba(92, 128, 188, 0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  refreshButtonText: {
-    color: '#5C80BC',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loadingText: {
-    textAlign: 'center',
-    color: '#6B7280',
-    fontSize: 16,
-    padding: 20,
-  },
-  lessonCount: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    marginTop: 4,
-  },
-  menuItemDisabled: {
-    opacity: 0.6,
-  },
-});
 
 export default ScheduleManagementScreen;

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert
 } from 'react-native';
+import { ComponentsStyles } from '../styles/ComponentsStyles';
 
 const ContactForm = ({ onSubmit, isLoading = false }) => {
   const [name, setName] = useState('');
@@ -28,10 +29,10 @@ const ContactForm = ({ onSubmit, isLoading = false }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Name</Text>
+    <View style={ComponentsStyles.formContainer}>
+      <Text style={ComponentsStyles.formLabel}>Name</Text>
       <TextInput
-        style={styles.input}
+        style={ComponentsStyles.formInput}
         placeholder="Enter name"
         placeholderTextColor="#9CA3AF"
         value={name}
@@ -39,9 +40,9 @@ const ContactForm = ({ onSubmit, isLoading = false }) => {
         editable={!isLoading}
       />
       
-      <Text style={styles.label}>Email</Text>
+      <Text style={ComponentsStyles.formLabel}>Email</Text>
       <TextInput
-        style={styles.input}
+        style={ComponentsStyles.formInput}
         placeholder="Enter email"
         placeholderTextColor="#9CA3AF"
         value={email}
@@ -53,73 +54,18 @@ const ContactForm = ({ onSubmit, isLoading = false }) => {
 
       <TouchableOpacity 
         style={[
-          styles.submitButton,
-          isLoading && styles.submitButtonDisabled
+          ComponentsStyles.submitButton,
+          isLoading && ComponentsStyles.submitButtonDisabled
         ]}
         onPress={handleSubmit}
         disabled={isLoading}
       >
-        <Text style={styles.submitButtonText}>
+        <Text style={ComponentsStyles.submitButtonText}>
           {isLoading ? 'Добавление...' : 'Добавить'}
         </Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 20,
-    shadowColor: '#4A306D',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#4A306D',
-  },
-  input: {
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    marginBottom: 16,
-    backgroundColor: '#F9FAFB',
-    color: '#374151',
-  },
-  submitButton: {
-    backgroundColor: '#4A306D',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-    shadowColor: '#4A306D',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  submitButtonDisabled: {
-    backgroundColor: '#9CA3AF',
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  submitButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-});
 
 export default ContactForm;

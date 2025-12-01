@@ -1,4 +1,3 @@
-// components/GroupSelector.js
 import React from 'react';
 import {
   View,
@@ -7,6 +6,7 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
+import { ComponentsStyles } from '../styles/ComponentsStyles';
 
 const GroupSelector = ({ 
   availableGroups, 
@@ -31,20 +31,20 @@ const GroupSelector = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={ComponentsStyles.selectorContainer}>
       {/* Выбранные группы */}
       {selectedGroups.length > 0 && (
-        <View style={styles.selectedSection}>
-          <Text style={styles.sectionTitle}>Выбранные группы:</Text>
-          <View style={styles.selectedGroupsContainer}>
+        <View style={ComponentsStyles.selectedSection}>
+          <Text style={ComponentsStyles.sectionTitle}>Выбранные группы:</Text>
+          <View style={ComponentsStyles.selectedGroupsContainer}>
             {selectedGroups.map(group => (
               <TouchableOpacity
                 key={group.id}
-                style={styles.selectedGroupChip}
+                style={ComponentsStyles.selectedGroupChip}
                 onPress={() => toggleGroup(group)}
               >
-                <Text style={styles.selectedGroupText}>{group.name}</Text>
-                <Text style={styles.removeIcon}>✕</Text>
+                <Text style={ComponentsStyles.selectedGroupText}>{group.name}</Text>
+                <Text style={ComponentsStyles.removeIcon}>✕</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -53,26 +53,26 @@ const GroupSelector = ({
 
       {/* Доступные группы */}
       {availableGroups.length > 0 && (
-        <View style={styles.availableSection}>
-          <Text style={styles.sectionTitle}>Доступные группы:</Text>
+        <View style={ComponentsStyles.availableSection}>
+          <Text style={ComponentsStyles.sectionTitle}>Доступные группы:</Text>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
-            style={styles.groupsScroll}
+            style={ComponentsStyles.groupsScroll}
           >
-            <View style={styles.groupsContainer}>
+            <View style={ComponentsStyles.groupsContainer}>
               {availableGroups.map(group => (
                 <TouchableOpacity
                   key={group.id}
                   style={[
-                    styles.groupChip,
-                    isGroupSelected(group) && styles.groupChipSelected
+                    ComponentsStyles.groupChip,
+                    isGroupSelected(group) && ComponentsStyles.groupChipSelected
                   ]}
                   onPress={() => toggleGroup(group)}
                 >
                   <Text style={[
-                    styles.groupChipText,
-                    isGroupSelected(group) && styles.groupChipTextSelected
+                    ComponentsStyles.groupChipText,
+                    isGroupSelected(group) && ComponentsStyles.groupChipTextSelected
                   ]}>
                     {group.name}
                   </Text>
@@ -85,98 +85,13 @@ const GroupSelector = ({
 
       {/* Кнопка создания новой группы */}
       <TouchableOpacity 
-        style={styles.createGroupButton}
+        style={ComponentsStyles.createGroupButton}
         onPress={onCreateGroup}
       >
-        <Text style={styles.createGroupButtonText}>+ Создать новую группу</Text>
+        <Text style={ComponentsStyles.createGroupButtonText}>+ Создать новую группу</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  selectedSection: {
-    marginBottom: 16,
-  },
-  availableSection: {
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4A306D',
-    marginBottom: 8,
-  },
-  selectedGroupsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  selectedGroupChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#4A306D',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  selectedGroupText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-    marginRight: 6,
-  },
-  removeIcon: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  groupsScroll: {
-    marginHorizontal: -5,
-  },
-  groupsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 5,
-  },
-  groupChip: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-  },
-  groupChipSelected: {
-    backgroundColor: '#4A306D',
-    borderColor: '#4A306D',
-  },
-  groupChipText: {
-    fontSize: 14,
-    color: '#4A306D',
-    fontWeight: '600',
-  },
-  groupChipTextSelected: {
-    color: '#FFFFFF',
-  },
-  createGroupButton: {
-    backgroundColor: 'rgba(74, 48, 109, 0.1)',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#4A306D',
-    borderStyle: 'dashed',
-  },
-  createGroupButtonText: {
-    color: '#4A306D',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default GroupSelector;
