@@ -59,10 +59,6 @@ const SubjectDetailScreen = ({ route, navigation }) => {
     navigation.goBack();
   };
 
-  const handleAddGroup = () => {
-    Alert.alert('Информация', 'Функция добавления группы будет реализована позже');
-  };
-
   const requestStoragePermission = async () => {
     if (Platform.OS !== 'android') {
       return true; 
@@ -240,52 +236,21 @@ const SubjectDetailScreen = ({ route, navigation }) => {
 
       <ScrollView style={ScreenStyles.subjectDetailScreenScrollView} showsVerticalScrollIndicator={false}>
         
-        {/* Информация о группах */}
+        {/* Кнопка выгрузки посещаемости */}
         <Section>
-          <View style={ScreenStyles.subjectDetailScreenSectionHeader}>
-            <Text style={ScreenStyles.subjectDetailScreenSectionTitle}>Группы</Text>
-            <TouchableOpacity 
-              style={ScreenStyles.subjectDetailScreenRefreshButton}
-              onPress={loadSubjectData}
-            >
-              <Text style={ScreenStyles.subjectDetailScreenRefreshButtonText}>⟳</Text>
-            </TouchableOpacity>
-          </View>
-          
-          {uniqueGroups.length > 0 ? (
-            <View style={ScreenStyles.subjectDetailScreenGroupsContainer}>
-              {uniqueGroups.map((group, index) => (
-                <View key={index} style={ScreenStyles.subjectDetailScreenGroupChip}>
-                  <Text style={ScreenStyles.subjectDetailScreenGroupChipText}>{group}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View style={ScreenStyles.subjectDetailScreenEmptyState}>
-              <Text style={ScreenStyles.subjectDetailScreenEmptyStateText}>Группы не добавлены</Text>
-            </View>
-          )}
-          
-          <TouchableOpacity 
-            style={ScreenStyles.subjectDetailScreenAddButton}
-            onPress={handleAddGroup}
-          >
-            <Text style={ScreenStyles.subjectDetailScreenAddButtonText}>+ Добавить группу</Text>
-          </TouchableOpacity>
+          <SaveButton
+            onPress={handleExport}
+            text="Выгрузить посещаемость в Excel"
+            isLoading={isExporting}
+            disabled={isExporting}
+            style={ScreenStyles.subjectDetailScreenExportButton}
+          />
         </Section>
 
         {/* Расписание занятий */}
         <Section title="Расписание занятий">
           {lessons.length > 0 ? (
             <View style={ScreenStyles.subjectDetailScreenScheduleContainer}>
-              <SaveButton
-                onPress={handleExport}
-                text="Выгрузить посещаемость"
-                isLoading={isExporting}
-                disabled={isExporting}
-                style={ScreenStyles.subjectDetailScreenExportButton}
-              />
-              
               {Object.entries(groupedLessons).map(([day, dayLessons]) => (
                 <View key={day} style={ScreenStyles.subjectDetailScreenDaySection}>
                   <Text style={ScreenStyles.subjectDetailScreenDayTitle}>{getDayName(parseInt(day))}</Text>
