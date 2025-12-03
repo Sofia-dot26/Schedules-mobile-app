@@ -24,66 +24,66 @@ const forceRecreateDatabase = async (db) => {
 
 // Миграции
 const SCHEDULE_MIGRATIONS = [
-  {
-    version: 1,
-    up: async (db) => {
-      await db.execAsync(`
-        CREATE TABLE IF NOT EXISTS subjects (
-          id INTEGER PRIMARY KEY NOT NULL,
-          name TEXT NOT NULL,
-          groups TEXT DEFAULT '[]',
-          created_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );
+// В миграцию v1 нужно добавить поле isHeadman в таблицу students:
+{
+  version: 1,
+  up: async (db) => {
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS subjects (
+        id INTEGER PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        groups TEXT DEFAULT '[]',
+        created_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
 
-        CREATE TABLE IF NOT EXISTS lessons (
-          id INTEGER PRIMARY KEY NOT NULL,
-          subjectId INTEGER NOT NULL,
-          subjectName TEXT NOT NULL,
-          group_name TEXT NOT NULL,
-          dayOfWeek INTEGER NOT NULL,
-          startTime TEXT NOT NULL,
-          endTime TEXT NOT NULL,
-          weekType TEXT NOT NULL,
-          classroom TEXT,
-          lessonType TEXT,
-          created_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (subjectId) REFERENCES subjects (id)
-        );
+      CREATE TABLE IF NOT EXISTS lessons (
+        id INTEGER PRIMARY KEY NOT NULL,
+        subjectId INTEGER NOT NULL,
+        subjectName TEXT NOT NULL,
+        group_name TEXT NOT NULL,
+        dayOfWeek INTEGER NOT NULL,
+        startTime TEXT NOT NULL,
+        endTime TEXT NOT NULL,
+        weekType TEXT NOT NULL,
+        classroom TEXT,
+        lessonType TEXT,
+        created_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (subjectId) REFERENCES subjects (id)
+      );
 
-        CREATE TABLE IF NOT EXISTS students (
-          id INTEGER PRIMARY KEY NOT NULL,
-          lastName TEXT NOT NULL,
-          firstName TEXT NOT NULL,
-          middleName TEXT,
-          group_name TEXT NOT NULL,
-          studentId TEXT NOT NULL UNIQUE,
-          email TEXT,
-          phone TEXT,
-          created_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );
+      CREATE TABLE IF NOT EXISTS students (
+        id INTEGER PRIMARY KEY NOT NULL,
+        lastName TEXT NOT NULL,
+        firstName TEXT NOT NULL,
+        middleName TEXT,
+        group_name TEXT NOT NULL,
+        isHeadman INTEGER DEFAULT 0, -- Добавлено: является ли старостой (0 или 1)
+        email TEXT,
+        phone TEXT,
+        created_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
 
-        CREATE INDEX IF NOT EXISTS idx_lessons_day_week ON lessons(dayOfWeek, weekType);
-        CREATE INDEX IF NOT EXISTS idx_lessons_subject ON lessons(subjectId);
-        CREATE INDEX IF NOT EXISTS idx_students_group ON students(group_name);
-        CREATE INDEX IF NOT EXISTS idx_students_studentId ON students(studentId);
-        
-        -- Вставляем демо-предметы
-        INSERT OR IGNORE INTO subjects (id, name, groups) VALUES 
-        (1, 'Математика', '["ИСТ-122", "ИСТ-123"]'),
-        (2, 'Физика', '["ИСТ-122"]'),
-        (3, 'Программирование', '[]'),
-        (4, 'Базы данных', '[]'),
-        (5, 'Веб-разработка', '[]');
+      CREATE INDEX IF NOT EXISTS idx_lessons_day_week ON lessons(dayOfWeek, weekType);
+      CREATE INDEX IF NOT EXISTS idx_lessons_subject ON lessons(subjectId);
+      CREATE INDEX IF NOT EXISTS idx_students_group ON students(group_name);
+      
+      -- Вставляем демо-предметы
+      INSERT OR IGNORE INTO subjects (id, name, groups) VALUES 
+      (1, 'Математика', '["ИСТ-122", "ИСТ-123"]'),
+      (2, 'Физика', '["ИСТ-122"]'),
+      (3, 'Программирование', '[]'),
+      (4, 'Базы данных', '[]'),
+      (5, 'Веб-разработка', '[]');
 
-        -- Вставляем демо-студентов
-        INSERT OR IGNORE INTO students (id, lastName, firstName, middleName, group_name, studentId, email, phone) VALUES 
-        (1, 'Иванов', 'Иван', 'Иванович', 'ИСТ-122', 'IST122001', 'ivanov@edu.ru', '+79161234567'),
-        (2, 'Петрова', 'Мария', 'Сергеевна', 'ИСТ-122', 'IST122002', 'petrova@edu.ru', '+79161234568'),
-        (3, 'Сидоров', 'Алексей', 'Петрович', 'ИСТ-123', 'IST123001', 'sidorov@edu.ru', '+79161234569'),
-        (4, 'Козлова', 'Елена', 'Владимировна', 'ИСТ-122', 'IST122003', 'kozlova@edu.ru', '+79161234570');
-      `);
-    }
-  },
+      -- Вставляем демо-студентов
+      INSERT OR IGNORE INTO students (id, lastName, firstName, middleName, group_name, isHeadman, email, phone) VALUES 
+      (1, 'Иванов', 'Иван', 'Иванович', 'ИСТ-122', 1, 'ivanov@edu.ru', '+79161234567'),
+      (2, 'Петрова', 'Мария', 'Сергеевна', 'ИСТ-122', 0, 'petrova@edu.ru', '+79161234568'),
+      (3, 'Сидоров', 'Алексей', 'Петрович', 'ИСТ-123', 1, 'sidorov@edu.ru', '+79161234569'),
+      (4, 'Козлова', 'Елена', 'Владимировна', 'ИСТ-122', 0, 'kozlova@edu.ru', '+79161234570');
+    `);
+  }
+},
   {
     version: 2,
     up: async (db) => {

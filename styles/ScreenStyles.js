@@ -2124,5 +2124,16 @@ commonDeleteButton: {
 },
 commonDeleteButtonText: {
   fontSize: 18,
-}
+},
+addStudentScreenHeadmanSwitch: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 16,
+  padding: 12,
+  backgroundColor: '#F8F7FF',
+  borderRadius: 12,
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+},
 });

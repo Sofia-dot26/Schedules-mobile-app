@@ -31,16 +31,6 @@ class StudentService {
     }
 
     try {
-      // Проверяем уникальность studentId
-      const existingStudent = await db.getFirstAsync(
-        'SELECT id FROM students WHERE studentId = ?',
-        student.studentId
-      );
-
-      if (existingStudent) {
-        throw new Error('Студент с таким номером студенческого билета уже существует');
-      }
-
       // Получаем название группы по ID
       const groupName = await this.getGroupNameById(studentData.group_id);
       if (!groupName) {
@@ -48,15 +38,15 @@ class StudentService {
       }
 
       const result = await db.runAsync(
-        `INSERT INTO students (lastName, firstName, middleName, group_name, studentId, email, phone) 
+        `INSERT INTO students (lastName, firstName, middleName, group_name, email, phone, isHeadman) 
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
         student.lastName,
         student.firstName,
         student.middleName || null,
-        groupName, 
-        student.studentId,
+        groupName,
         student.email || null,
-        student.phone || null
+        student.phone || null,
+        student.isHeadman ? 1 : 0
       );
 
       const newStudent = {
@@ -92,27 +82,17 @@ class StudentService {
         throw new Error(`Ошибка валидации: ${errors.join(', ')}`);
       }
 
-      // Проверяем уникальность studentId (исключая текущего студента)
-      const existingStudent = await db.getFirstAsync(
-        'SELECT id FROM students WHERE studentId = ? AND id != ?',
-        student.studentId, studentId
-      );
-
-      if (existingStudent) {
-        throw new Error('Студент с таким номером студенческого билета уже существует');
-      }
-
       await db.runAsync(
         `UPDATE students 
-         SET lastName = ?, firstName = ?, middleName = ?, group_name = ?, studentId = ?, email = ?, phone = ?
+         SET lastName = ?, firstName = ?, middleName = ?, group_name = ?, email = ?, phone = ?, isHeadman = ?
          WHERE id = ?`,
         student.lastName,
         student.firstName,
         student.middleName || null,
         groupName,
-        student.studentId,
         student.email || null,
         student.phone || null,
+        student.isHeadman ? 1 : 0,
         studentId
       );
 
@@ -127,7 +107,6 @@ class StudentService {
     }
   }
 
-  // Вспомогательный метод для получения названия группы по ID
   async getGroupNameById(groupId) {
     const db = await this.ensureDatabase();
     try {
@@ -239,9 +218,9 @@ class StudentService {
                g.id as group_id
         FROM students s 
         LEFT JOIN groups g ON s.group_name = g.name
-        WHERE s.lastName LIKE ? OR s.firstName LIKE ? OR s.middleName LIKE ? OR s.group_name LIKE ? OR s.studentId LIKE ?
+        WHERE s.lastName LIKE ? OR s.firstName LIKE ? OR s.middleName LIKE ? OR s.group_name LIKE ?
         ORDER BY s.group_name, s.lastName, s.firstName
-      `, [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm]);
+      `, [searchTerm, searchTerm, searchTerm, searchTerm]);
       
       return students.map(student => Student.fromJSON({
         ...student,
@@ -251,6 +230,55 @@ class StudentService {
     } catch (error) {
       console.error('Error searching students:', error);
       throw new Error('Не удалось выполнить поиск');
+    }
+  }
+
+  // Новый метод: получить старосту группы
+  async getGroupHeadman(groupName) {
+    const db = await this.ensureDatabase();
+    try {
+      const headman = await db.getFirstAsync(`
+        SELECT s.*, 
+               g.id as group_id
+        FROM students s 
+        LEFT JOIN groups g ON s.group_name = g.name
+        WHERE s.group_name = ? AND s.isHeadman = 1
+        ORDER BY s.lastName, s.firstName
+      `, groupName);
+      
+      return headman ? Student.fromJSON({
+        ...headman,
+        group: headman.group_name,
+        group_id: headman.group_id
+      }) : null;
+    } catch (error) {
+      console.error('Error fetching group headman:', error);
+      return null;
+    }
+  }
+
+  // Новый метод: обновить старосту группы
+  async setGroupHeadman(groupName, studentId) {
+    const db = await this.ensureDatabase();
+    try {
+      // Сначала сбрасываем старосту у всех студентов группы
+      await db.runAsync(
+        'UPDATE students SET isHeadman = 0 WHERE group_name = ?',
+        groupName
+      );
+      
+      // Назначаем нового старосту
+      if (studentId) {
+        await db.runAsync(
+          'UPDATE students SET isHeadman = 1 WHERE id = ?',
+          studentId
+        );
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error setting group headman:', error);
+      throw new Error('Не удалось назначить старосту');
     }
   }
 }

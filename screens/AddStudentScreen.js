@@ -1,10 +1,12 @@
+// AddStudentScreen.js
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
   TouchableOpacity, 
   ScrollView, 
-  Alert
+  Alert,
+  Switch
 } from 'react-native';
 import StudentService from '../services/StudentService';
 import GroupService from '../services/GroupService';
@@ -22,9 +24,9 @@ const AddStudentScreen = ({ route, navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(null);
-  const [studentId, setStudentId] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [isHeadman, setIsHeadman] = useState(false);
   const [availableGroups, setAvailableGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(false);
@@ -37,9 +39,9 @@ const AddStudentScreen = ({ route, navigation }) => {
       setFirstName(student.firstName);
       setMiddleName(student.middleName || '');
       setSelectedGroup(student.group_id ? { id: student.group_id, name: student.group } : null);
-      setStudentId(student.studentId);
       setEmail(student.email || '');
       setPhone(student.phone || '');
+      setIsHeadman(student.isHeadman || false);
     }
   }, [isEdit, student]);
 
@@ -70,8 +72,8 @@ const AddStudentScreen = ({ route, navigation }) => {
   };
 
   const handleSave = async () => {
-    if (!lastName.trim() || !firstName.trim() || !selectedGroup || !studentId.trim()) {
-      Alert.alert('Ошибка', 'Заполните обязательные поля: Фамилия, Имя, Группа, Номер студенческого билета');
+    if (!lastName.trim() || !firstName.trim() || !selectedGroup) {
+      Alert.alert('Ошибка', 'Заполните обязательные поля: Фамилия, Имя, Группа');
       return;
     }
 
@@ -84,12 +86,34 @@ const AddStudentScreen = ({ route, navigation }) => {
         middleName: middleName.trim(),
         group_id: selectedGroup.id, 
         group_name: selectedGroup.name, 
-        studentId: studentId.trim(),
         email: email.trim() || null,
-        phone: phone.trim() || null
+        phone: phone.trim() || null,
+        isHeadman: isHeadman
       };
 
       if (isEdit) {
+        // Если назначаем старосту, проверяем не назначен ли уже другой староста
+        if (isHeadman && student.id) {
+          const currentHeadman = await StudentService.getGroupHeadman(selectedGroup.name);
+          if (currentHeadman && currentHeadman.id !== student.id) {
+            const confirm = await new Promise((resolve) => {
+              Alert.alert(
+                'Назначить старостой',
+                `В группе "${selectedGroup.name}" уже есть староста "${currentHeadman.fullName}". Заменить его?`,
+                [
+                  { text: 'Отмена', onPress: () => resolve(false) },
+                  { text: 'Заменить', onPress: () => resolve(true) }
+                ]
+              );
+            });
+            
+            if (!confirm) {
+              setIsLoading(false);
+              return;
+            }
+          }
+        }
+        
         await StudentService.updateStudent(student.id, studentData);
         Alert.alert('Успех', 'Данные студента обновлены');
       } else {
@@ -103,17 +127,6 @@ const AddStudentScreen = ({ route, navigation }) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const generateStudentId = () => {
-    if (!selectedGroup) {
-      Alert.alert('Внимание', 'Сначала выберите группу');
-      return;
-    }
-    
-    const groupPrefix = selectedGroup.name.replace('-', '').toUpperCase();
-    const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    setStudentId(`${groupPrefix}${randomNum}`);
   };
 
   return (
@@ -210,26 +223,30 @@ const AddStudentScreen = ({ route, navigation }) => {
             </View>
           )}
           
-          <FormLabel text="Номер студенческого билета" required />
-          <View style={ScreenStyles.addStudentScreenStudentIdContainer}>
-            <FormInput
-              style={ScreenStyles.addStudentScreenStudentIdInput}
-              placeholder="Например: IST122001"
-              value={studentId}
-              onChangeText={setStudentId}
-            />
-            <TouchableOpacity 
-              style={ScreenStyles.addStudentScreenGenerateButton}
-              onPress={generateStudentId}
-              disabled={!selectedGroup}
-            >
-              <Text style={[
-                ScreenStyles.addStudentScreenGenerateButtonText,
-                !selectedGroup && ScreenStyles.addStudentScreenGenerateButtonTextDisabled
-              ]}>
-                🎲
+          {/* Переключатель "Староста" */}
+          <View style={{ 
+            flexDirection: 'row', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginTop: 16,
+            padding: 12,
+            backgroundColor: '#F8F7FF',
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: '#E5E7EB'
+          }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: '#4A306D' }}>Староста группы</Text>
+              <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
+                Назначить этого студента старостой группы
               </Text>
-            </TouchableOpacity>
+            </View>
+            <Switch
+              value={isHeadman}
+              onValueChange={setIsHeadman}
+              trackColor={{ false: '#D1D5DB', true: '#4A306D' }}
+              thumbColor="#FFFFFF"
+            />
           </View>
         </Section>
 

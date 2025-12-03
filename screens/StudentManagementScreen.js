@@ -34,10 +34,12 @@ const StudentManagementScreen = ({ navigation }) => {
     try {
       setIsLoading(true);
       const studentsData = await StudentService.getAllStudents();
-      const groupsData = await StudentService.getAllGroups();
+      
+      // Получаем группы из студентов
+      const uniqueGroups = [...new Set(studentsData.map(s => s.group).filter(Boolean))];
       
       setStudents(studentsData);
-      setGroups(groupsData);
+      setGroups(uniqueGroups);
     } catch (error) {
       console.error('Error loading students:', error);
       Alert.alert('Ошибка', 'Не удалось загрузить студентов');
@@ -61,8 +63,7 @@ const StudentManagementScreen = ({ navigation }) => {
         student.lastName.toLowerCase().includes(query) ||
         student.firstName.toLowerCase().includes(query) ||
         student.middleName?.toLowerCase().includes(query) ||
-        student.group.toLowerCase().includes(query) ||
-        student.studentId.toLowerCase().includes(query)
+        student.group.toLowerCase().includes(query)
       );
     }
 
@@ -129,7 +130,7 @@ const StudentManagementScreen = ({ navigation }) => {
         {/* Поиск и фильтры */}
         <Section style={ScreenStyles.studentManagementScreenFiltersSection}>
           <FormInput
-            placeholder="Поиск по ФИО, группе или номеру билета..."
+            placeholder="Поиск по ФИО или группе..."
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={ScreenStyles.studentManagementScreenSearchInput}

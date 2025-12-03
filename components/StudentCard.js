@@ -14,8 +14,13 @@ const StudentCard = ({
         <Text style={ScreenStyles.commonStudentName}>
           {student.lastName} {student.firstName} {student.middleName || ''}
         </Text>
+        {student.isHeadman && (
+            <View style={style.headmanBadge}>
+              <Text style={style.headmanText}>👑 Староста</Text>
+            </View>
+          )}
         <Text style={ScreenStyles.commonStudentDetails}>
-          Группа: {student.group} • №: {student.studentId}
+          Группа: {student.group} 
         </Text>
         {student.email && (
           <Text style={ScreenStyles.commonStudentContact}>Email: {student.email}</Text>
