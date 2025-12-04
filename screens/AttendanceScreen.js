@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import StudentService from '../services/StudentService';
 import AttendanceService from '../services/AttendanceService';
-import ScheduleService from '../services/ScheduleService';
 import Header from '../components/Header';
 import Section from '../components/Section';
 import FormInput from '../components/FormInput';
@@ -24,8 +23,12 @@ const AttendanceScreen = ({ route, navigation }) => {
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
+    navigation.setOptions({
+      headerShown: false
+    });
     loadStudents();
     loadAttendance();
+
   }, [lesson, attendanceDate]);
 
   const loadStudents = async () => {
@@ -132,11 +135,14 @@ const AttendanceScreen = ({ route, navigation }) => {
 
   return (
     <View style={ScreenStyles.attendanceScreenContainer}>
+      {/* Единая шапка с заголовком и кнопками навигации */}
       <Header
         title="Посещаемость"
+        showBackButton={true}
         onBack={handleBack}
+        showLogoutButton={true}
         onLogout={handleLogout}
-        headerStyle={ScreenStyles.scheduleManagementScreenHeader}
+        headerStyle={ScreenStyles.scheduleScreenHeader}
       />
 
       <ScrollView style={ScreenStyles.attendanceScreenScrollView} showsVerticalScrollIndicator={false}>

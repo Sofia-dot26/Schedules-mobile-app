@@ -44,8 +44,10 @@ const ScheduleScreen = ({ navigation }) => {
   };
 
   const handleLessonPress = (lesson) => {
-    navigation.navigate('Attendance', { lesson });
+    navigation.navigate('Attendance', { lesson})
+
   };
+  
 
   const days = [
     { id: 1, name: 'Понедельник', short: 'ПН' },
