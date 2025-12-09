@@ -21,6 +21,7 @@ const AttendanceScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
+  const [bulkSelectMode, setBulkSelectMode] = useState(null); // 'present', 'absent', or null
 
   useEffect(() => {
     navigation.setOptions({
@@ -28,7 +29,6 @@ const AttendanceScreen = ({ route, navigation }) => {
     });
     loadStudents();
     loadAttendance();
-
   }, [lesson, attendanceDate]);
 
   const loadStudents = async () => {
@@ -54,6 +54,13 @@ const AttendanceScreen = ({ route, navigation }) => {
       const attendanceMap = {};
       attendanceRecords.forEach(record => {
         attendanceMap[record.studentId] = record.status;
+      });
+      
+      // Инициализируем отсутствующими для тех, у кого нет записи
+      students.forEach(student => {
+        if (!attendanceMap[student.id]) {
+          attendanceMap[student.id] = 'absent';
+        }
       });
       
       setAttendance(attendanceMap);
@@ -87,6 +94,26 @@ const AttendanceScreen = ({ route, navigation }) => {
     }));
   };
 
+  // Функция для отметки всех студентов сразу
+  const markAllStudents = (status) => {
+    const newAttendance = { ...attendance };
+    students.forEach(student => {
+      newAttendance[student.id] = status;
+    });
+    setAttendance(newAttendance);
+    setBulkSelectMode(status);
+  };
+
+  // Функция для очистки всех отметок (все отсутствуют)
+  const clearAllMarks = () => {
+    const newAttendance = { ...attendance };
+    students.forEach(student => {
+      newAttendance[student.id] = 'absent';
+    });
+    setAttendance(newAttendance);
+    setBulkSelectMode(null);
+  };
+
   const handleSaveAttendance = async () => {
     try {
       setIsSaving(true);
@@ -106,6 +133,7 @@ const AttendanceScreen = ({ route, navigation }) => {
 
       await Promise.all(savePromises);
       Alert.alert('Успех', 'Посещаемость сохранена');
+      setBulkSelectMode(null); // Сбросить режим массового выбора после сохранения
     } catch (error) {
       console.error('Error saving attendance:', error);
       Alert.alert('Ошибка', 'Не удалось сохранить посещаемость');
@@ -117,7 +145,6 @@ const AttendanceScreen = ({ route, navigation }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'present': return '#10B981';
-      case 'late': return '#F59E0B';
       case 'absent': return '#EF4444';
       default: return '#6B7280';
     }
@@ -125,10 +152,9 @@ const AttendanceScreen = ({ route, navigation }) => {
 
   const getAttendanceStats = () => {
     const present = Object.values(attendance).filter(status => status === 'present').length;
-    const late = Object.values(attendance).filter(status => status === 'late').length;
     const absent = Object.values(attendance).filter(status => status === 'absent').length;
     
-    return { present, late, absent, total: students.length };
+    return { present, absent, total: students.length };
   };
 
   const stats = getAttendanceStats();
@@ -175,10 +201,6 @@ const AttendanceScreen = ({ route, navigation }) => {
               <Text style={ScreenStyles.attendanceScreenStatLabel}>Присут.</Text>
             </View>
             <View style={ScreenStyles.attendanceScreenStatItem}>
-              <Text style={ScreenStyles.attendanceScreenStatNumber}>{stats.late}</Text>
-              <Text style={ScreenStyles.attendanceScreenStatLabel}>Опозд.</Text>
-            </View>
-            <View style={ScreenStyles.attendanceScreenStatItem}>
               <Text style={ScreenStyles.attendanceScreenStatNumber}>{stats.absent}</Text>
               <Text style={ScreenStyles.attendanceScreenStatLabel}>Отсут.</Text>
             </View>
@@ -188,6 +210,48 @@ const AttendanceScreen = ({ route, navigation }) => {
             </View>
           </View>
         </Section>
+
+        {/* Панель массового выбора */}
+        {students.length > 0 && !isLoading && (
+          <Section>
+            <View style={ScreenStyles.attendanceScreenSectionHeader}>
+              <Text style={ScreenStyles.attendanceScreenSectionTitle}>Массовая отметка</Text>
+            </View>
+            <View style={ScreenStyles.attendanceScreenBulkActions}>
+              <TouchableOpacity
+                style={[
+                  ScreenStyles.attendanceScreenBulkButton,
+                  bulkSelectMode === 'present' && ScreenStyles.attendanceScreenBulkButtonActive,
+                  { backgroundColor: bulkSelectMode === 'present' ? '#10B981' : '#F3F4F6' }
+                ]}
+                onPress={() => markAllStudents('present')}
+              >
+                <Text style={[
+                  ScreenStyles.attendanceScreenBulkButtonText,
+                  bulkSelectMode === 'present' && ScreenStyles.attendanceScreenBulkButtonTextActive
+                ]}>
+                  Отметить всех присутствующими
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[
+                  ScreenStyles.attendanceScreenBulkButton,
+                  bulkSelectMode === 'absent' && ScreenStyles.attendanceScreenBulkButtonActive,
+                  { backgroundColor: bulkSelectMode === 'absent' ? '#EF4444' : '#F3F4F6' }
+                ]}
+                onPress={() => markAllStudents('absent')}
+              >
+                <Text style={[
+                  ScreenStyles.attendanceScreenBulkButtonText,
+                  bulkSelectMode === 'absent' && ScreenStyles.attendanceScreenBulkButtonTextActive
+                ]}>
+                  Отметить всех отсутствующими
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Section>
+        )}
 
         {/* Список студентов */}
         <Section>
@@ -227,22 +291,6 @@ const AttendanceScreen = ({ route, navigation }) => {
                       attendance[student.id] === 'present' && ScreenStyles.attendanceScreenStatusButtonTextActive
                     ]}>
                       ✓
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[
-                      ScreenStyles.attendanceScreenStatusButton,
-                      attendance[student.id] === 'late' && ScreenStyles.attendanceScreenStatusButtonActive,
-                      { backgroundColor: attendance[student.id] === 'late' ? '#F59E0B' : '#F3F4F6' }
-                    ]}
-                    onPress={() => handleStatusChange(student.id, 'late')}
-                  >
-                    <Text style={[
-                      ScreenStyles.attendanceScreenStatusButtonText,
-                      attendance[student.id] === 'late' && ScreenStyles.attendanceScreenStatusButtonTextActive
-                    ]}>
-                      ⚡
                     </Text>
                   </TouchableOpacity>
                   

@@ -1224,8 +1224,7 @@ export const ScreenStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
-    paddingTop: 60,     
+    marginBottom: 20,    
   },
   scheduleScreenHeaderLeft: {
     flexDirection: 'row',
@@ -2135,5 +2134,47 @@ addStudentScreenHeadmanSwitch: {
   borderRadius: 12,
   borderWidth: 1,
   borderColor: '#E5E7EB',
+},
+// Добавьте эти стили в ScreenStyles объект
+attendanceScreenBulkActions: {
+  flexDirection: 'column',
+  gap: 10,
+  marginTop: 10,
+},
+attendanceScreenBulkButton: {
+  paddingVertical: 12,
+  paddingHorizontal: 16,
+  borderRadius: 8,
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+},
+attendanceScreenBulkButtonActive: {
+  borderWidth: 2,
+},
+attendanceScreenBulkButtonText: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#374151',
+},
+attendanceScreenBulkButtonTextActive: {
+  color: '#FFFFFF',
+  fontWeight: '700',
+},
+attendanceScreenClearButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 16,
+  borderRadius: 8,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FEF2F2',
+  borderWidth: 1,
+  borderColor: '#FECACA',
+},
+attendanceScreenClearButtonText: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#DC2626',
 },
 });
