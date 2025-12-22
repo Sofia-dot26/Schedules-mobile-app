@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "appname",
+    "name": "Журнал",
     "slug": "appname",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
@@ -37,7 +37,20 @@
       "favicon": "./assets/logo.png"
     },
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+       "expo-web-browser",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true,
+            "networkSecurityConfig": "@xml/network_security_config"
+          },
+          "ios": {
+            "usesNonExemptEncryption": false
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {
