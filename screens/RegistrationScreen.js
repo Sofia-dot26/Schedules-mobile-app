@@ -229,14 +229,19 @@ const RegistrationScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f7ff',
+    paddingBottom:60,
+    height:100
+    
   },
   scrollContent: {
+    
     flexGrow: 1,
     paddingVertical: 20,
+    
   },
   formContainer: {
-    marginHorizontal: 20,
+    marginHorizontal: 5
   },
   errorText: {
     color: '#dc3545',
