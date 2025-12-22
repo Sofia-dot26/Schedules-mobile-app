@@ -254,6 +254,7 @@ export const ComponentsStyles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     borderWidth: 1,
     borderColor: '#E5E7EB',
+    marginBottom:60
   },
   cancelButtonText: {
     fontSize: 16,
@@ -266,6 +267,7 @@ export const ComponentsStyles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     backgroundColor: '#4A306D',
+    marginBottom:60
   },
   createButtonDisabled: {
     backgroundColor: '#9CA3AF',
@@ -274,6 +276,7 @@ export const ComponentsStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+    
   },
 
   // Стили для GroupSelector
