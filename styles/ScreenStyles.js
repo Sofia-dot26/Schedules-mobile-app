@@ -1,12 +1,16 @@
 import { StyleSheet } from 'react-native';
 
 export const ScreenStyles = StyleSheet.create({
+  safeAreaViewContainer:{
+    paddingBottom:30
+  },
   // Стили для LoginScreen
   loginScreenContainer: {
     flex: 1,
     backgroundColor: '#F8F7FF',
     justifyContent: 'center',
     padding: 20,
+     paddingTop:80
   },
   loginScreenHeader: {
     alignItems: 'center',
@@ -182,6 +186,7 @@ export const ScreenStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F7FF',
     padding: 20,
+    paddingBottom:60
   },
   addGroupScreenHeader: {
     flexDirection: 'row',
@@ -265,6 +270,7 @@ export const ScreenStyles = StyleSheet.create({
   addLessonScreenContainer: {
     flex: 1,
     backgroundColor: '#F8F7FF',
+    paddingBottom:60
   },
   addLessonScreenHeader: {
     flexDirection: 'row',
@@ -311,6 +317,7 @@ export const ScreenStyles = StyleSheet.create({
   addLessonScreenScrollView: {
     flex: 1,
     padding: 20,
+    paddingBottom:30,
   },
   addLessonScreenSection: {
     backgroundColor: '#FFFFFF',
@@ -563,6 +570,7 @@ export const ScreenStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+    paddingBottom:20,
   },
   addLessonScreenModalButton: {
     flex: 1,
@@ -581,6 +589,7 @@ export const ScreenStyles = StyleSheet.create({
   },
   addLessonScreenModalAddButton: {
     backgroundColor: '#4A306D',
+    paddingBottom:30,
   },
   addLessonScreenModalCancelButtonText: {
     fontSize: 16,
@@ -596,6 +605,7 @@ export const ScreenStyles = StyleSheet.create({
   addStudentScreenContainer: {
     flex: 1,
     backgroundColor: '#F8F7FF',
+    paddingBottom:60
   },
   addStudentScreenHeader: {
     flexDirection: 'row',
@@ -647,7 +657,7 @@ export const ScreenStyles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
-    marginBottom: 16,
+    marginBottom: 20,
     shadowColor: '#4A306D',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -702,6 +712,7 @@ export const ScreenStyles = StyleSheet.create({
   },
   addStudentScreenSelectedGroupContainer: {
     marginBottom: 16,
+     paddingBottom:60
   },
   addStudentScreenSelectedGroup: {
     flexDirection: 'row',
@@ -800,10 +811,11 @@ export const ScreenStyles = StyleSheet.create({
   addStudentScreenSaveButton: {
     backgroundColor: '#4A306D',
     padding: 18,
+    paddingBottom:20,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 40,
     shadowColor: '#4A306D',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -823,6 +835,7 @@ export const ScreenStyles = StyleSheet.create({
   attendanceScreenContainer: {
     flex: 1,
     backgroundColor: '#F8F7FF',
+        paddingBottom:60
   },
   attendanceScreenHeader: {
     flexDirection: 'row',
@@ -1064,6 +1077,7 @@ export const ScreenStyles = StyleSheet.create({
   scheduleManagementScreenContainer: {
     flex: 1,
     backgroundColor: '#F8F7FF',
+        paddingBottom:60
 
   },
   scheduleManagementScreenHeader: {
@@ -1450,6 +1464,7 @@ export const ScreenStyles = StyleSheet.create({
   studentManagementScreenContainer: {
     flex: 1,
     backgroundColor: '#F8F7FF',
+    paddingBottom:60
   },
   studentManagementScreenHeader: {
     flexDirection: 'row',
@@ -1578,6 +1593,7 @@ export const ScreenStyles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 5,
+    
   },
   studentManagementScreenSectionHeader: {
     flexDirection: 'row',
@@ -1610,6 +1626,7 @@ export const ScreenStyles = StyleSheet.create({
     marginBottom: 12,
     borderLeftWidth: 4,
     borderLeftColor: '#4A306D',
+    
   },
   studentManagementScreenStudentInfo: {
     flex: 1,
